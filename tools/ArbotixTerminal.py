@@ -171,7 +171,7 @@ class shell(wx.TextCtrl):
         else:
             return 1    # default to 1Mbps
 
-class Terminal(ToolPane):
+class ArbotixTerminal(ToolPane):
     """ arbotix/bioloid terminal. """
     def __init__(self, parent, port=None):
         ToolPane.__init__(self, parent, port)
