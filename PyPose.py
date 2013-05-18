@@ -149,8 +149,10 @@ class editor(wx.Frame):
         self.loadTool()
         self.sb.SetStatusText('please create or open a project...',0)
         self.Centre()
-        # small hack for windows... 9-25-09 MEF
-        self.SetBackgroundColour(wx.NullColor)
+        # small hack for WX 2.9
+        if wx.__version__[0:3] != '2.9':
+            # small hack for windows... 9-25-09 MEF
+            self.SetBackgroundColour(wx.NullColor)
         self.Show(True)
 
     ###########################################################################
