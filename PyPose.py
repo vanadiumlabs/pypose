@@ -407,7 +407,7 @@ class NewProjectDialog(wx.Dialog):
 
 if __name__ == "__main__":
     print "PyPose starting... "
-    app = wx.PySimpleApp()
+    app = wx.App()
     frame = editor()
     app.MainLoop()
 
