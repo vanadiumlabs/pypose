@@ -302,10 +302,9 @@ class NukeEditor(ToolPane):
         modelClass = getattr(modelModule, modelClassName)
         # make instance            
         model = modelClass(int(self.optChoice),True)    # dofORlegs/debug/GaitGen
-        model.config( [int(v.GetValue()) for v in self.vars], [int(s.GetValue()) for s in self.servos])
+        model.config( self.optChoice , [int(v.GetValue()) for v in self.vars], [int(s.GetValue()) for s in self.servos], [1024,] + self.parent.project.resolution)
         model.mins = [512,] + self.parent.project.poses["ik_min"]
         model.maxs = [512,] + self.parent.project.poses["ik_max"]
-        model.resolution = [1024,] + self.parent.project.resolution
         model.neutrals = [512,] + self.parent.project.poses["ik_neutral"]
         model.signs = [1,] + [1+(-2*(t=="-")) for t in self.signs]    
         self.model = model

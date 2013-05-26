@@ -88,7 +88,7 @@ class lizard3(dict):
         # Used to generate servo values for IK
         self.mins = [512 for i in range(3*self.legs+1)]
         self.maxs = [512 for i in range(3*self.legs+1)]
-        self.resolution = [1024 for i in range(3*self.legs+1)]
+        self.resolutions = [1024 for i in range(3*self.legs+1)]
         self.neutrals = [512 for i in range(3*self.legs+1)]
         self.nextPose = [512 for i in range(3*self.legs+1)]
         self.signs = [1 for i in range(3*self.legs+1)]
