@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" 
+"""
   PyPose: Bioloid pose system for arbotiX robocontroller
   Nuke: The Nearly Universal Kinematics Engine
   Copyright (c) 2009-2010 Michael E. Ferguson.  All right reserved.
@@ -50,64 +50,64 @@ class NukeEditor(ToolPane):
         ToolPane.__init__(self, parent, port)
         # default data
         self.signs = "+"*18
-        self.curpose = "" 
+        self.curpose = ""
         self.ikChoice = ""
         self.optChoice = ""
-        
+
         self.sizer = wx.GridBagSizer(10,10)
-    
+
         # IK styles/Config
         temp = wx.StaticBox(self, -1, 'IK Config')
         temp.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-        configBox = wx.StaticBoxSizer(temp,orient=wx.VERTICAL) 
+        configBox = wx.StaticBoxSizer(temp,orient=wx.VERTICAL)
         configSizer = wx.GridBagSizer(5,5)
         configSizer.Add(wx.StaticText(self, -1, "IK Type:"),(0,0), wx.GBSpan(1,1),wx.ALIGN_CENTER_VERTICAL|wx.TOP,10)
         self.ikType = wx.ComboBox(self, self.ID_IKTYPE, choices=iKmodels.keys())
-        configSizer.Add(self.ikType,(0,1),wx.GBSpan(1,1),wx.TOP,10)   
-        
+        configSizer.Add(self.ikType,(0,1),wx.GBSpan(1,1),wx.TOP,10)
+
         # IK Option (typical # of legs or # of DOF)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.optLabel = wx.StaticText(self, -1, "# of Legs:")
         configSizer.Add(self.optLabel,(1,0), wx.GBSpan(1,1),wx.ALIGN_CENTER_VERTICAL)
         self.ikOpt = wx.ComboBox(self, self.ID_IKOPT, choices=["4","6"])
-        configSizer.Add(self.ikOpt,(1,1))     
+        configSizer.Add(self.ikOpt,(1,1))
         configBox.Add(configSizer)
         self.sizer.Add(configBox, (0,1), wx.GBSpan(1,1), wx.EXPAND)
 
         # Actions buttons
         temp = wx.StaticBox(self, -1, 'Actions')
         temp.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-        actionBox = wx.StaticBoxSizer(temp,orient=wx.VERTICAL) 
+        actionBox = wx.StaticBoxSizer(temp,orient=wx.VERTICAL)
         actionSizer = wx.GridBagSizer(5,5)
 
         actionSizer.Add(wx.StaticText(self, -1, "Capture Limits:"), (0,0), wx.GBSpan(1,1),wx.ALIGN_CENTER_VERTICAL)
         actionSizer.Add(wx.StaticText(self, -1, "Capture Neutral:"), (1,0), wx.GBSpan(1,1),wx.ALIGN_CENTER_VERTICAL)
         actionSizer.Add(wx.StaticText(self, -1, "Set/Test Signs:"), (2,0), wx.GBSpan(1,1),wx.ALIGN_CENTER_VERTICAL)
-                
+
         actionSizer.Add(wx.Button(self, self.BT_LIMITS, 'Capture'),(0,1))
         actionSizer.Add(wx.Button(self, self.BT_NEUTRAL, 'Capture'),(1,1))
-        self.signButton = wx.Button(self, self.BT_SIGN, 'Go')        
+        self.signButton = wx.Button(self, self.BT_SIGN, 'Go')
         actionSizer.Add(self.signButton,(2,1))
-        
+
         actionBox.Add(actionSizer)
-        self.sizer.Add(actionBox, (1,1), wx.GBSpan(1,1), wx.EXPAND)    
+        self.sizer.Add(actionBox, (1,1), wx.GBSpan(1,1), wx.EXPAND)
 
         # NUKE Label
         nukeIt = wx.StaticText(self, -1, "NUKE: Get Your IK On")
         nukeIt.SetFont(wx.Font(15, wx.DEFAULT, wx.NORMAL, wx.BOLD, wx.ITALIC))
-        self.sizer.Add(nukeIt, (2,0), wx.GBSpan(1,2), wx.ALIGN_CENTER_VERTICAL)        
+        self.sizer.Add(nukeIt, (2,0), wx.GBSpan(1,2), wx.ALIGN_CENTER_VERTICAL)
 
         # Buttons
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         gaitBut = wx.Button(self,-1,'Gait Builder')
-        gaitBut.Disable()        
+        gaitBut.Disable()
         hbox.Add(gaitBut)
         viewBut = wx.Button(self,-1, 'Viewer/Tuner')
         viewBut.Disable()
         hbox.Add(viewBut)
         hbox.Add(wx.Button(self, self.BT_DRIVE, 'Test Drive'))
         hbox.Add(wx.Button(self,self.BT_EXPORT, 'Export'))
-        self.sizer.Add(hbox, (2,2), wx.GBSpan(1,1), wx.ALIGN_CENTER) 
+        self.sizer.Add(hbox, (2,2), wx.GBSpan(1,1), wx.ALIGN_CENTER)
 
         # Load Data (if possible)
         self.loadData()
@@ -116,32 +116,32 @@ class NukeEditor(ToolPane):
         self.sizer.Fit(self)
 
         # event handling
-        wx.EVT_BUTTON(self, self.BT_LIMITS, self.doLimits)                
+        wx.EVT_BUTTON(self, self.BT_LIMITS, self.doLimits)
         wx.EVT_BUTTON(self, self.BT_NEUTRAL, self.doNeutral)
-        wx.EVT_BUTTON(self, self.BT_SIGN, self.doSignTest) 
-        wx.EVT_BUTTON(self, self.BT_DRIVE, self.doWalkTest) 
-        wx.EVT_BUTTON(self, self.BT_EXPORT, self.doExport) 
+        wx.EVT_BUTTON(self, self.BT_SIGN, self.doSignTest)
+        wx.EVT_BUTTON(self, self.BT_DRIVE, self.doWalkTest)
+        wx.EVT_BUTTON(self, self.BT_EXPORT, self.doExport)
 
         wx.EVT_COMBOBOX(self, self.ID_IKTYPE, self.doIKType)
-        wx.EVT_COMBOBOX(self, self.ID_IKOPT, self.doIkOpt) 
-        wx.EVT_SPINCTRL(self, self.ID_ANY, self.save)         
-    
-    
+        wx.EVT_COMBOBOX(self, self.ID_IKOPT, self.doIkOpt)
+        wx.EVT_SPINCTRL(self, self.ID_ANY, self.save)
+
+
     ###########################################################################
-    # draw buttons, etc. 
+    # draw buttons, etc.
     def getModel(self):
         modelClassName = iKmodels[self.ikChoice].folder
         if "tools/models/"+modelClassName not in sys.path:
             sys.path.append("tools/models/"+modelClassName)
         modelModule = __import__(modelClassName, globals(), locals(), [modelClassName])
         modelClass = getattr(modelModule, modelClassName)
-        # make instance            
+        # make instance
         self.model = modelClass(int(self.optChoice),True)    # dofORlegs/debug/GaitGen
         return self.model
 
     def makePanel(self):
         if self.ikChoice == "":
-            return            
+            return
         self.getModel()
         try:
             self.servoBox.Clear(True)
@@ -151,15 +151,15 @@ class NukeEditor(ToolPane):
         except:
             pass
 
-        # Body Dimensions 
+        # Body Dimensions
         temp = wx.StaticBox(self, -1, 'Body Dimensions')
         temp.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-        self.bodyBox = wx.StaticBoxSizer(temp,orient=wx.VERTICAL) 
+        self.bodyBox = wx.StaticBoxSizer(temp,orient=wx.VERTICAL)
         bodySizer = wx.GridBagSizer(5,5)
         index = 0
         self.vars = list()
         for group in self.model.vars_layout:
-            # each group has [label, elements, image] 
+            # each group has [label, elements, image]
             bodySizer.Add(wx.StaticText(self, -1, group[0]), (index,0), wx.GBSpan(1,1), wx.EXPAND | wx.TOP, 10)
             index = index + 1
             count = 0
@@ -179,7 +179,7 @@ class NukeEditor(ToolPane):
         # Servo ID Selections
         temp = wx.StaticBox(self, -1, 'Servo Assignments')
         temp.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-        self.servoBox = wx.StaticBoxSizer(temp,orient=wx.VERTICAL) 
+        self.servoBox = wx.StaticBoxSizer(temp,orient=wx.VERTICAL)
         servoSizer = wx.GridBagSizer(5,5)
         self.servos = list()
         index = 0
@@ -208,7 +208,7 @@ class NukeEditor(ToolPane):
     def doChecks(self, checks):
         for c in checks:
             if c == "project":
-                if self.parent.project.name == "":   
+                if self.parent.project.name == "":
                     self.parent.sb.SetBackgroundColour('RED')
                     self.parent.sb.SetStatusText('please create a project')
                     self.parent.timer.Start(30)
@@ -224,23 +224,26 @@ class NukeEditor(ToolPane):
                     self.parent.sb.SetBackgroundColour('RED')
                     self.parent.sb.SetStatusText('Please fill in IK variables...')
                     self.parent.timer.Start(30)
-                    return 0    
+                    return 0
             else:
                 print "Unknown System Check:", c
-        # all systems go!        
-        return 1 
+        # all systems go!
+        return 1
 
     ###########################################################################
     # data management
-    def loadData(self):        
+    def loadData(self):
         """ Load the NUKE string from our project, configure screen/model. """
         if self.parent.project.name == "":
+            print "NUKE: No project name"
             # Disable it all
             self.ikType.Disable()
             self.ikOpt.Disable()
         elif self.parent.project.nuke == "":
+            print "NUKE: No nuke string"
             self.ikOpt.Disable()     # Allow selection of ikType
         else:
+            print "NUKE: " + self.parent.project.nuke.rstrip()
             nukeStr = self.parent.project.nuke.rstrip()
             # primary data
             self.ikChoice = nukeStr[0:nukeStr.find(",")]
@@ -248,7 +251,7 @@ class NukeEditor(ToolPane):
             self.ikType.Disable()   # Can't change type - breaks templates
             nukeStr = nukeStr[nukeStr.find(",")+1:]
             self.optChoice = nukeStr[0:nukeStr.find(",")]
-            self.ikOpt.SetValue(self.optChoice)            
+            self.ikOpt.SetValue(self.optChoice)
             nukeStr = nukeStr[nukeStr.find(",")+1:]
             self.signs = nukeStr[0:nukeStr.find(",")]
             nukeStr = nukeStr[nukeStr.find(",")+1:]
@@ -263,22 +266,22 @@ class NukeEditor(ToolPane):
                 nukeStr = nukeStr[nukeStr.find(",")+1:]
             self.servos[len(self.servos)-1].SetValue(int(nukeStr))
             # Data loaded, now Enable/Disable as needed
-            if self.ikType.GetValue() == "": 
+            if self.ikType.GetValue() == "":
                 self.ikOpt.Disable()
             else:
                 self.ikOpt.SetItems([str(c) for c in iKmodels[self.ikType.GetValue()].options])
-                self.ikOpt.Enable()        
+                self.ikOpt.Enable()
             if self.ikType.GetValue() == "" or self.ikOpt.GetValue() == "":
                 # Disable it all
-                for var in self.vars:  
+                for var in self.vars:
                     var.Disable()
-                for servo in self.servos:        
+                for servo in self.servos:
                     servo.Disable()
             else:
                 self.model.opt = int(self.optChoice)
                 self.model.adjustPanel(self)
 
-    def save(self, e=None):     
+    def save(self, e=None):
         """ Export the NUKE string to our project, mark project as needing a save. """
         if self.ikType.GetValue() == "" or self.ikOpt.GetValue() == "":
             return
@@ -292,7 +295,7 @@ class NukeEditor(ToolPane):
         nukeStr = nukeStr[0:-1]  # trim last ','
         self.parent.project.nuke = nukeStr
         self.parent.project.save = True
-    
+
     def configModel(self):
         """ Load the model for our IK solution. """
         modelClassName = iKmodels[self.ikChoice].folder
@@ -300,36 +303,36 @@ class NukeEditor(ToolPane):
             sys.path.append("tools/models/"+modelClassName)
         modelModule = __import__(modelClassName, globals(), locals(), [modelClassName])
         modelClass = getattr(modelModule, modelClassName)
-        # make instance            
+        # make instance
         model = modelClass(int(self.optChoice),True)    # dofORlegs/debug/GaitGen
         model.config( self.optChoice , [int(v.GetValue()) for v in self.vars], [int(s.GetValue()) for s in self.servos], [1024,] + self.parent.project.resolution)
         model.mins = [512,] + self.parent.project.poses["ik_min"]
         model.maxs = [512,] + self.parent.project.poses["ik_max"]
         model.neutrals = [512,] + self.parent.project.poses["ik_neutral"]
-        model.signs = [1,] + [1+(-2*(t=="-")) for t in self.signs]    
+        model.signs = [1,] + [1+(-2*(t=="-")) for t in self.signs]
         self.model = model
 
     ###########################################################################
-    # holla back -- the simple callbacks 
+    # holla back -- the simple callbacks
     def writePose(self, pose, dt):
         # set pose size -- IMPORTANT!
         self.port.execute(253, 7, [self.parent.project.count])
         # download the pose
-        self.port.execute(253, 8, [0] + project.extract(pose))                 
-        self.port.execute(253, 9, [0, dt%256, dt>>8,255,0,0])                
+        self.port.execute(253, 8, [0] + project.extract(pose))
+        self.port.execute(253, 9, [0, dt%256, dt>>8,255,0,0])
         self.port.execute(253, 10, list())
     def doSignTest(self, e=None):
         """ Do the sign test, let's hope we pass. This is handled by the model. """
         if self.doChecks(["project","port","ik"]) > 0:
             self.configModel()
-            self.signs = self.model.doSignTest(self) 
+            self.signs = self.model.doSignTest(self)
             self.save()
     def doWalkTest(self, e=None):
         """ Load a virtual commander, to drive around. """
         # TODO: Popup box telling you not to do this with the PyPose sketch!
         if self.doChecks(["port"]) > 0:
-            comm = Commander(self, self.port.ser)    
-            comm.Center()    
+            comm = Commander(self, self.port.ser)
+            comm.Center()
     def doIKType(self, e=None):
         """ Set IKType, make leg box visible """
         self.ikChoice = self.ikType.GetValue()
@@ -340,7 +343,7 @@ class NukeEditor(ToolPane):
         self.makePanel()
     def doIkOpt(self, e=None):
         """ Set the # of legs (or DOF), make everything else visible. """
-        self.ikType.Disable()        
+        self.ikType.Disable()
         self.optChoice = self.ikOpt.GetValue()
         self.model.config(self.optChoice)
         self.makePanel()
@@ -367,13 +370,13 @@ class NukeEditor(ToolPane):
                 result = wx.ID_OK
                 if error == 0:      # first time through, ask user to prepare
                     dlg = NukeDialog(self.parent, 'Capture Limits', 'Click OK when you have moved\n   servo ' + str(servoID) + ' to one extreme')
-                    result = dlg.ShowModal()      
-                    dlg.Destroy()                 
+                    result = dlg.ShowModal()
+                    dlg.Destroy()
                 if result == wx.ID_OK:
                     try:
                         # read in servo position
                         a = self.port.getReg(servoID,P_PRESENT_POSITION_L, 2)
-                        a = a[0] + (a[1]<<8) 
+                        a = a[0] + (a[1]<<8)
                         # get other limit
                         self.captureLimits(servoID,1,a)
                     except:
@@ -382,15 +385,15 @@ class NukeEditor(ToolPane):
                         else:           # fail and move on
                             dlg = wx.MessageDialog(self.parent, 'Unable to read servo ' + str(servoID), 'Capture Error', wx.OK)
                             dlg.ShowModal()
-                            self.captureLimits(servoID+1)  
+                            self.captureLimits(servoID+1)
                 elif result == 42:
                     self.captureLimits(servoID-1)
             else:
                 result = wx.ID_OK
                 if error == 0:      # first time through, ask user to prepare
                     dlg = NukeDialog(self.parent, 'Capture Limits', 'Click OK when you have moved\n    servo ' + str(servoID) + ' to the other extreme')
-                    result = dlg.ShowModal()                   
-                    dlg.Destroy()               
+                    result = dlg.ShowModal()
+                    dlg.Destroy()
                 if result == wx.ID_OK:
                     # read in other position
                     try:
@@ -399,12 +402,12 @@ class NukeEditor(ToolPane):
                         # do our update to pose
                         if prev > a:
                             self.parent.project.poses["ik_max"][servoID-1] = prev
-                            self.parent.project.poses["ik_min"][servoID-1] = a  
-                            print "Capture Limits", servoID, ":", a, " to ", prev                
+                            self.parent.project.poses["ik_min"][servoID-1] = a
+                            print "Capture Limits", servoID, ":", a, " to ", prev
                         else:
                             self.parent.project.poses["ik_max"][servoID-1] = a
                             self.parent.project.poses["ik_min"][servoID-1] = prev
-                            print "Capture Limits", servoID, ":", prev, ",", a  
+                            print "Capture Limits", servoID, ":", prev, ",", a
                         self.captureLimits(servoID+1)
                     except:
                         if error < 3:   # try again
@@ -412,7 +415,7 @@ class NukeEditor(ToolPane):
                         else:           # fail and move on
                             dlg = wx.MessageDialog(self.parent, 'Unable to read servo ' + str(servoID), 'Capture Error', wx.OK)
                             dlg.ShowModal()
-                            self.captureLimits(servoID+1)  
+                            self.captureLimits(servoID+1)
                 elif result == 42:
                     self.captureLimits(servoID)
     def doNeutral(self, e = None):
@@ -432,10 +435,10 @@ class NukeEditor(ToolPane):
                     pos = self.port.getReg(servo+1,P_PRESENT_POSITION_L, 2)
                     if pos != -1:
                         self.parent.project.poses["ik_neutral"][servo] = pos[0] + (pos[1]<<8)
-                    else: 
+                    else:
                         errors = errors + str(servo+1) + ", "
                 if errors != "could not read servos: ":
-                    self.parent.sb.SetStatusText(errors[0:-2],0)  
+                    self.parent.sb.SetStatusText(errors[0:-2],0)
 
     ###########################################################################
     # export
@@ -490,10 +493,10 @@ class NukeEditor(ToolPane):
                 params["@SERVO_INDEXES"] = params["@SERVO_INDEXES"] + "#define " + k + " " + str(v) + "\n"
             params["@SERVO_MINS"] = "int mins[] = {"+str(self.parent.project.poses["ik_min"])+"};"
             params["@SERVO_MAXS"] = "int maxs[] = {"+str(self.parent.project.poses["ik_max"])+"};"
-            # Simple Heuristics (TODO: Replace with a gait builder) 
-            params["@X_STANCE"] = str(self.vars[0].GetValue()) 
+            # Simple Heuristics (TODO: Replace with a gait builder)
+            params["@X_STANCE"] = str(self.vars[0].GetValue())
             params["@Y_STANCE"] = str(self.vars[0].GetValue() + self.vars[1].GetValue())
-            params["@Z_STANCE"] = str(int(0.75*self.vars[2].GetValue())) 
+            params["@Z_STANCE"] = str(int(0.75*self.vars[2].GetValue()))
             params["@LIFT_HEIGHT"] = str(int(0.2*self.vars[2].GetValue()))
             # 10 or 12-bit?
             if self.parent.project.resolution[0] == 1024:
@@ -501,14 +504,14 @@ class NukeEditor(ToolPane):
             elif self.parent.project.resolution[0] == 4096:
                 params["@RAD_TO_SERVO_RESOLUTION"] = str(25)
 
-            # load general parameters 
+            # load general parameters
             template = open("tools/models/core/template.ik").readlines()
             code = dict()
             current = ""
             for line in template:
                 if line.find("@") == 0 and current == "":
                     current = line.strip().rstrip()
-                elif line.find("@END_SECTION") > -1:                
+                elif line.find("@END_SECTION") > -1:
                     current = ""
                 else:
                     try:
@@ -516,13 +519,13 @@ class NukeEditor(ToolPane):
                     except:
                         code[current] = line
             # load the parameters for our particular model
-            modelDir = iKmodels[self.ikType.GetValue()].folder         
+            modelDir = iKmodels[self.ikType.GetValue()].folder
             template = open("tools/models/"+modelDir+"/template.ik").readlines()
             current = ""
             for line in template:
                 if line.find("@") == 0 and current == "":
                     current = line.strip().rstrip()
-                elif line.find("@END_SECTION") > -1:                
+                elif line.find("@END_SECTION") > -1:
                     current = ""
                 else:
                     try:
@@ -535,9 +538,9 @@ class NukeEditor(ToolPane):
             # load default templates
             templates["gaits.h"] = open("tools/models/core/gaits.h").read()
             templates["nuke.h"] = open("tools/models/core/nuke.h").read()
-            templates["nuke.cpp"] = open("tools/models/core/nuke.cpp").read() 
-            sketch = os.path.split(skDir)[1]        
-            templates[sketch+".ino"] = open("tools/models/core/default.pde").read()     
+            templates["nuke.cpp"] = open("tools/models/core/nuke.cpp").read()
+            sketch = os.path.split(skDir)[1]
+            templates[sketch+".ino"] = open("tools/models/core/default.pde").read()
             # for each file
             for fileName in templates.keys():
                 # insert code blocks
@@ -548,12 +551,12 @@ class NukeEditor(ToolPane):
                     if var.find("@") == 0:
                         templates[fileName] = templates[fileName].replace(var,val)
                 for k,v in servoMap.items():
-                    templates[fileName] = templates[fileName].replace("@NEUTRAL_"+k, str(self.parent.project.poses["ik_neutral"][v-1]))        
+                    templates[fileName] = templates[fileName].replace("@NEUTRAL_"+k, str(self.parent.project.poses["ik_neutral"][v-1]))
                     templates[fileName] = templates[fileName].replace("@SIGN_"+k, self.signs[v-1:v])
-                # save and reopen as lines                
+                # save and reopen as lines
                 open(skDir+"/temp","w").write(templates[fileName])
                 template = open(skDir+"/temp").readlines()
-                # process IF/ELSE/END            
+                # process IF/ELSE/END
                 i = 0
                 out = None
                 if fileName.endswith(".pde"):
@@ -570,7 +573,7 @@ class NukeEditor(ToolPane):
                         line = template[i][template[i].find("@IF")+3:].strip().rstrip()
                         var = line[0:line.find(" ")].rstrip()
                         val = line[line.find(" ")+1:].strip().rstrip().split()
-                        i = i + 1   
+                        i = i + 1
                         if params[var] in val:
                             while template[i].find("@ELSE") < 0 and template[i].find("@END_IF") < 0:
                                 print>>out, template[i].rstrip()
@@ -590,15 +593,15 @@ class NukeEditor(ToolPane):
                     i = i + 1
                 out.close()
 
-        
+
 ###########################################################################
 # A message box, with backup ability
 class NukeDialog(wx.Dialog):
     def __init__(self, parent, title, msg):
-        wx.Dialog.__init__(self, parent, 0, title, size=(390, 120))  
+        wx.Dialog.__init__(self, parent, 0, title, size=(390, 120))
 
         vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add(wx.StaticText(self, -1, msg, (340,100)), 1, wx.ALIGN_CENTER | wx.BOTTOM | wx.TOP, 10) 
+        vbox.Add(wx.StaticText(self, -1, msg, (340,100)), 1, wx.ALIGN_CENTER | wx.BOTTOM | wx.TOP, 10)
 
         # Cancel | Backup | OK
         hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -610,8 +613,8 @@ class NukeDialog(wx.Dialog):
         hbox.Add(okButton, 1, wx.LEFT, 5)
         vbox.Add(hbox, 1, wx.ALIGN_CENTER | wx.BOTTOM, 25)
 
-        self.SetSizer(vbox) 
-        wx.EVT_BUTTON(self, 42, self.doBackUp) 
+        self.SetSizer(vbox)
+        wx.EVT_BUTTON(self, 42, self.doBackUp)
 
     def doBackUp(self, e=None):
         self.EndModal(42)
@@ -642,6 +645,6 @@ class NeutralDialog(wx.Dialog):
         self.SetSizer(sizer_2)
         sizer_2.Fit(self)
         self.Layout()
-    
+
 NAME = "NUKE editor"
 STATUS = "starting NUKE..."
