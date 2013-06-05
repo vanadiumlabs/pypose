@@ -500,9 +500,9 @@ class NukeEditor(ToolPane):
             params["@LIFT_HEIGHT"] = str(int(0.2*self.vars[2].GetValue()))
             # 10 or 12-bit?
             if self.parent.project.resolution[0] == 1024:
-                params["@RAD_TO_SERVO_RESOLUTION"] = str(100)
+                params["@RAD_TO_SERVO_RESOLUTION"] = "195.56959407132f"
             elif self.parent.project.resolution[0] == 4096:
-                params["@RAD_TO_SERVO_RESOLUTION"] = str(25)
+                params["@RAD_TO_SERVO_RESOLUTION"] = "651.89864690440f"
 
             # load general parameters
             template = open("tools/models/core/template.ik").readlines()

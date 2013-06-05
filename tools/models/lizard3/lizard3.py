@@ -29,11 +29,9 @@ def sq(x):
 # Convert radians to servo position offset.
 def radToServo(rads, resolution = 1024):
     if resolution == 4096:
-        val = (rads*100)/51 * 25;
-        return int(val)
-    else: 
-        val = (rads*100)/51 * 100;
-        return int(val)
+        return int(val*651.8986469044033)
+    else:
+        return int(val*195.56959407132098)
 
 COXA = 0
 FEMUR = 1
