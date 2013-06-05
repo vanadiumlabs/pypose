@@ -445,7 +445,7 @@ class lizard3(dict):
             self["RIGHT_MIDDLE"] = [0,self.L_FEMUR+self.L_COXA,self.L_TIBIA]
             self["LEFT_MIDDLE"] = [0,-self.L_FEMUR-self.L_COXA,self.L_TIBIA]
             self.doIK()
-            parent.writePose(self.nextPose, 500)
+            parent.writePose(self.nextPose[1:], 500)
             dlg = wx.MessageDialog(parent, "Click OK when ready!", 'Sign Test', wx.OK)
             if dlg.ShowModal() == wx.ID_OK:    
                 return self.doSignTest(parent,1)
@@ -526,7 +526,7 @@ class lizard3(dict):
 
             # do IK and display dialog
             self.doIK()
-            parent.writePose(self.nextPose, 500)
+            parent.writePose(self.nextPose[1:], 500)
             dlg = wx.MessageDialog(parent, msg, 'Sign Test', wx.YES | wx.NO)
             result = dlg.ShowModal()    
             if result == wx.ID_CANCEL:
@@ -538,7 +538,7 @@ class lizard3(dict):
                 else:
                     self.signs[self.servos[servo]] = 1
                 self.doIK()
-                parent.writePose(self.nextPose, 500)
+                parent.writePose(self.nextPose[1:], 500)
             if step < (3*self.legs):
                 return self.doSignTest(parent,step+1)
             else:
