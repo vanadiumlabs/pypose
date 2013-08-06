@@ -285,19 +285,22 @@ class editor(wx.Frame):
             if self.port != None:
                 self.port.ser.close()
             print "Opening port: " + self.ports[dlg.GetSelection()]
-            try:
-                # TODO: add ability to select type of driver
-                self.port = Driver(self.ports[dlg.GetSelection()], 38400, True) # w/ interpolation
-                self.panel.port = self.port
-                self.panel.portUpdated()
-                self.sb.SetStatusText(self.ports[dlg.GetSelection()] + "@38400",1)
-            except:
-                self.port = None
-                self.sb.SetBackgroundColour('RED')
-                self.sb.SetStatusText("Could Not Open Port",0) 
-                self.sb.SetStatusText('not connected',1)
-                self.timer.Start(20)
+            self.openPort(self.ports[dlg.GetSelection()])
             dlg.Destroy()
+    def openPort(self, port, baud=38400, interpolate=True):
+        try:
+            # TODO: add ability to select type of driver
+            self.port = Driver(port, baud, interpolate)
+            self.panel.port = self.port
+            self.panel.portUpdated()
+            self.sb.SetStatusText(port + '@' + str(baud),1)
+        except:
+            self.port = None
+            self.sb.SetBackgroundColour('RED')
+            self.sb.SetStatusText('Could Not Open Port ' + port,0)
+            self.sb.SetStatusText('not connected',1)
+            self.timer.Start(20)
+        return self.port
         
     def doTest(self, e=None):
         if self.port != None:

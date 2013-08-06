@@ -92,19 +92,7 @@ class shell(wx.TextCtrl):
                     if self.parent.parent.port != None:
                         self.parent.parent.port.ser.close()
                     print "Opening port: " + l[1]
-                    try:
-                        # TODO: add ability to select type of driver
-                        self.port = Driver(str(l[1]), 38400, True)   # w/ interpolation
-                        self.parent.parent.port = self.port
-                        self.parent.parent.sb.SetStatusText(str(l[1]) + "@38400",1)
-                        self.write("\rOK!")
-                    except:
-                        self.port = None
-                        self.parent.parent.sb.SetStatusText('not connected',1)
-                        # print error
-                        self.parent.parent.sb.SetBackgroundColour('RED')
-                        self.parent.parent.sb.SetStatusText("Could Not Open Port",0) 
-                        self.parent.parent.timer.Start(20)  
+                    self.port = self.parent.parent.openPort(str(l[1]))
                 elif self.parent.parent.port == None:
                     self.write("\rNo port open!")
                 elif l[0] == u"ls":      # list servos
