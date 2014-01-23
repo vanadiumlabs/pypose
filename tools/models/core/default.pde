@@ -23,7 +23,7 @@ void setup(){
     setupIK();    
     gaitSelect(RIPPLE);
     // setup serial for usage with the Commander
-    commander.begin(38400);
+    command.begin(38400);
 
     // wait, then check the voltage (LiPO safety)
     delay (1000);
