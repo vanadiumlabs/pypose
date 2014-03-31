@@ -72,18 +72,18 @@ class editor(wx.Frame):
         # for clearing red color on status bar
         self.timer = wx.Timer(self, self.ID_TIMER)
         self.timeout = 0
-
+        
         # build our menu bar  
-        menubar = wx.MenuBar()
-        prjmenu = wx.Menu()
+	menubar = wx.MenuBar()
+	prjmenu = wx.Menu()
         prjmenu.Append(self.ID_NEW, "&New\tCtrl+N", "", wx.ITEM_NORMAL) # dialog with name, # of servos
-        prjmenu.Append(self.ID_OPEN, "&Open\tCtrl+O", "", wx.ITEM_NORMAL) # open file dialog
+	prjmenu.Append(self.ID_OPEN, "&Open\tCtrl+O", "", wx.ITEM_NORMAL) # open file dialog
 	prjmenu.AppendSeparator()       
 	prjmenu.Append(self.ID_SAVE,"&Save\tCtrl+S", "", wx.ITEM_NORMAL) # if name unknown, ask, otherwise save
-        prjmenu.Append(self.ID_SAVE_AS,"Save As") # ask for name, save
+	prjmenu.Append(self.ID_SAVE_AS,"Save As") # ask for name, save
         prjmenu.AppendSeparator()
-	prjmenu.Append(self.ID_EXIT, "&Quit\tCtrl+Q", "", wx.ITEM_NORMAL) 
-        menubar.Append(prjmenu, "Project")
+	prjmenu.Append(self.ID_EXIT, "&Quit\tCtrl+Q", "", wx.ITEM_NORMAL)
+	menubar.Append(prjmenu, "Project")
 
         toolsmenu = wx.Menu()
         # find our tools
@@ -125,6 +125,7 @@ class editor(wx.Frame):
         wx.EVT_MENU(self, self.ID_SAVE, self.saveFile)
         wx.EVT_MENU(self, self.ID_SAVE_AS, self.saveFileAs)
         wx.EVT_MENU(self, self.ID_EXIT, sys.exit)
+        
         for t in self.toolIndex.keys():
             wx.EVT_MENU(self, t, self.loadTool)
         wx.EVT_MENU(self, self.ID_EXPORT, self.export)     
@@ -154,7 +155,7 @@ class editor(wx.Frame):
             # small hack for windows... 9-25-09 MEF
             self.SetBackgroundColour(wx.NullColor)
         self.Show(True)
-   
+
     ###########################################################################
     # toolpane handling   
     def loadTool(self, e=None):
