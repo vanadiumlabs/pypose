@@ -56,7 +56,7 @@ class editor(wx.Frame):
 
     def __init__(self):
         """ Creates pose editor window. """
-        wx.Frame.__init__(self, None, -1, VERSION, style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
+        wx.Frame.__init__(self, None, -1, VERSION, style = wx.DEFAULT_FRAME_STYLE)
 
         # key data for our program
         self.project = project() # holds data for our project
@@ -74,15 +74,16 @@ class editor(wx.Frame):
         self.timeout = 0
         
         # build our menu bar  
-        menubar = wx.MenuBar()
-        prjmenu = wx.Menu()
-        prjmenu.Append(self.ID_NEW, "new") # dialog with name, # of servos
-        prjmenu.Append(self.ID_OPEN, "open") # open file dialog
-        prjmenu.Append(self.ID_SAVE,"save") # if name unknown, ask, otherwise save
-        prjmenu.Append(self.ID_SAVE_AS,"save as") # ask for name, save
+	menubar = wx.MenuBar()
+	prjmenu = wx.Menu()
+        prjmenu.Append(self.ID_NEW, "&New\tCtrl+N", "", wx.ITEM_NORMAL) # dialog with name, # of servos
+	prjmenu.Append(self.ID_OPEN, "&Open\tCtrl+O", "", wx.ITEM_NORMAL) # open file dialog
+	prjmenu.AppendSeparator()       
+	prjmenu.Append(self.ID_SAVE,"&Save\tCtrl+S", "", wx.ITEM_NORMAL) # if name unknown, ask, otherwise save
+	prjmenu.Append(self.ID_SAVE_AS,"Save As") # ask for name, save
         prjmenu.AppendSeparator()
-        prjmenu.Append(self.ID_EXIT,"exit") 
-        menubar.Append(prjmenu, "project")
+	prjmenu.Append(self.ID_EXIT, "&Quit\tCtrl+Q", "", wx.ITEM_NORMAL)
+	menubar.Append(prjmenu, "Project")
 
         toolsmenu = wx.Menu()
         # find our tools
@@ -98,7 +99,7 @@ class editor(wx.Frame):
             self.toolIndex[id] = (t, name)
             toolsmenu.Append(id,name)   
         toolsmenu.Append(self.ID_EXPORT,"export to AVR") # save as dialog
-        menubar.Append(toolsmenu,"tools")
+        menubar.Append(toolsmenu,"Tools")
 
         configmenu = wx.Menu()
         configmenu.Append(self.ID_PORT,"port") # dialog box: arbotix/thru, speed, port
@@ -110,11 +111,11 @@ class editor(wx.Frame):
         # live update
         self.live = configmenu.Append(self.ID_LIVE_UPDATE,"live pose update",kind=wx.ITEM_CHECK)
         #configmenu.Append(self.ID_TEST,"test") # for in-house testing of boards
-        menubar.Append(configmenu, "config")    
+        menubar.Append(configmenu, "Configuration")    
 
         helpmenu = wx.Menu()
-        helpmenu.Append(self.ID_ABOUT,"about")
-        menubar.Append(helpmenu,"help")
+        helpmenu.Append(self.ID_ABOUT,"About")
+        menubar.Append(helpmenu,"Help")
 
         self.SetMenuBar(menubar)    
 
@@ -124,7 +125,7 @@ class editor(wx.Frame):
         wx.EVT_MENU(self, self.ID_SAVE, self.saveFile)
         wx.EVT_MENU(self, self.ID_SAVE_AS, self.saveFileAs)
         wx.EVT_MENU(self, self.ID_EXIT, sys.exit)
-    
+        
         for t in self.toolIndex.keys():
             wx.EVT_MENU(self, t, self.loadTool)
         wx.EVT_MENU(self, self.ID_EXPORT, self.export)     
@@ -287,7 +288,7 @@ class editor(wx.Frame):
             print "Opening port: " + self.ports[dlg.GetSelection()]
             self.openPort(self.ports[dlg.GetSelection()])
             dlg.Destroy()
-    def openPort(self, port, baud=38400, interpolate=True):
+    def openPort(self, port, baud=115200, interpolate=True):
         try:
             # TODO: add ability to select type of driver
             self.port = Driver(port, baud, interpolate)
