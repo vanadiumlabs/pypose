@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" 
+"""
   PyPose: Serial driver for connection to arbotiX board or USBDynamixel.
   Copyright (c) 2008,2009 Michael E. Ferguson.  All right reserved.
 
@@ -26,7 +26,7 @@ from binascii import b2a_hex
 from ax12 import *
 
 class Driver:
-    """ Class to open a serial port and control AX-12 servos 
+    """ Class to open a serial port and control AX-12 servos
     through an arbotiX board or USBDynamixel. """
     def __init__(self, port="/dev/ttyUSB0",baud=38400, interpolation=False, direct=False):
         """ This may throw errors up the line -- that's a good thing. """
@@ -52,21 +52,21 @@ class Driver:
 
     def setReg(self, index, regstart, values):
         """ Set the value of registers. Should be called as such:
-        ax12.setReg(1,1,(0x01,0x05)) """ 
+        ax12.setReg(1,1,(0x01,0x05)) """
         self.execute(index, AX_WRITE_DATA, [regstart] + values)
-        return self.error     
+        return self.error
 
     def getPacket(self, mode, id=-1, leng=-1, error=-1, params = None):
         """ Read a return packet, iterative attempt """
         # need a positive byte
         d = self.ser.read()
-        if d == '': 
+        if d == '':
             print("Fail Read")
             return None
 
         # now process our byte
         if mode == 0:           # get our first 0xFF
-            if ord(d) == 0xff:   
+            if ord(d) == 0xff:
                 print("Oxff found")
                 return self.getPacket(1)
             else:
@@ -83,13 +83,13 @@ class Driver:
             if d != 0xff:
                 print("ID found: " + str(ord(d)))
                 return self.getPacket(3, ord(d))
-            else:              
+            else:
                 print("0xff is not ID, restart")
                 return self.getPacket(0)
         elif mode == 3:         # get length
             print("Length found: " + str(ord(d)))
             return self.getPacket(4, id, ord(d))
-        elif mode == 4:         # read error    
+        elif mode == 4:         # read error
             print("Error level found: " + str(ord(d)))
             self.error = ord(d)
             if leng == 2:
@@ -120,19 +120,19 @@ class Driver:
         vals = self.execute(index, AX_READ_DATA, [regstart, rlength])
         if vals == None:
             print("Read Failed: Servo ID = " + str(index))
-            return -1        
+            return -1
         if rlength == 1:
             return vals[0]
         return vals
 
     def syncWrite(self, regstart, vals):
         """ Set the value of registers. Should be called as such:
-        ax12.syncWrite(reg, ((id1, val1, val2), (id2, val1, val2))) """ 
+        ax12.syncWrite(reg, ((id1, val1, val2), (id2, val1, val2))) """
         self.ser.flushInput()
         length = 4
         valsum = 0
         for i in vals:
-            length = length + len(i)    
+            length = length + len(i)
             valsum = valsum + sum(i)
         checksum = 255 - ((254 + length + AX_SYNC_WRITE + regstart + len(vals[0]) - 1 + valsum)%256)
         # packet: FF FF ID LENGTH INS(0x03) PARAM .. CHECKSUM

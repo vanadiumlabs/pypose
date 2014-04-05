@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" 
+"""
   PyPose: Bioloid pose system for arbotiX robocontroller
   Copyright (c) 2009,2010 Michael E. Ferguson.  All right reserved.
 
@@ -37,15 +37,15 @@ width = 300
 class Commander(wx.Frame):
     TIMER_ID = 100
 
-    def __init__(self, parent, ser, debug = False):  
+    def __init__(self, parent, ser, debug = False):
         wx.Frame.__init__(self, parent, -1, "ArbotiX Commander", style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
-        self.ser = ser    
+        self.ser = ser
 
         sizer = wx.GridBagSizer(10,10)
 
         self.drive = wx.Panel(self,size=(width,width-20))
         self.drive.SetBackgroundColour('WHITE')
-        self.drive.Bind(wx.EVT_MOTION, self.onMove)  
+        self.drive.Bind(wx.EVT_MOTION, self.onMove)
         wx.StaticLine(self.drive, -1, (width/2, 0), (1,width), style=wx.LI_VERTICAL)
         wx.StaticLine(self.drive, -1, (0, width/2), (width,1))
         sizer.Add(self.drive,(0,0),wx.GBSpan(2,1),wx.EXPAND|wx.ALL,5)
@@ -55,18 +55,18 @@ class Commander(wx.Frame):
         # Selection for horizontal movement
         horiz = wx.StaticBox(self, -1, 'Horizontal Movement')
         horiz.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-        horizBox = wx.StaticBoxSizer(horiz,orient=wx.VERTICAL) 
+        horizBox = wx.StaticBoxSizer(horiz,orient=wx.VERTICAL)
 
         self.selTurn = wx.RadioButton(self, -1, 'Turn', style=wx.RB_GROUP)
-        horizBox.Add(self.selTurn)        
+        horizBox.Add(self.selTurn)
         self.selStrafe = wx.RadioButton(self, -1, 'Strafe')
-        horizBox.Add(self.selStrafe)        
+        horizBox.Add(self.selStrafe)
         sizer.Add(horizBox, (0,1), wx.GBSpan(1,1), wx.EXPAND|wx.TOP|wx.RIGHT,5)
 
         # Body rotations
         body = wx.StaticBox(self, -1, 'Body Movement')
         body.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
-        bodyBox = wx.StaticBoxSizer(body,orient=wx.VERTICAL) 
+        bodyBox = wx.StaticBoxSizer(body,orient=wx.VERTICAL)
         bodySizer = wx.GridBagSizer(5,5)
 
         bodySizer.Add(wx.StaticText(self, -1, "Pan:"),(0,0), wx.GBSpan(1,1),wx.ALIGN_CENTER_VERTICAL)
@@ -79,8 +79,8 @@ class Commander(wx.Frame):
         self.roll = wx.Slider(self, -1, 0, -100, 100, wx.DefaultPosition, (200, -1), wx.SL_HORIZONTAL | wx.SL_LABELS)
         self.roll.Disable()
         bodySizer.Add(self.roll,(2,1))
-        bodyBox.Add(bodySizer) 
-        
+        bodyBox.Add(bodySizer)
+
         sizer.Add(bodyBox, (1,1), wx.GBSpan(1,1), wx.EXPAND|wx.BOTTOM|wx.RIGHT,5)
 
         # timer for output
@@ -98,10 +98,10 @@ class Commander(wx.Frame):
         self.Destroy()
 
     def onMove(self, event=None):
-        if event.LeftIsDown():        
+        if event.LeftIsDown():
             pt = event.GetPosition()
             self.forward = ((width/2)-pt[1])/2
-            self.turn = (pt[0]-(width/2))/2           
+            self.turn = (pt[0]-(width/2))/2
         else:
             self.forward = 0
             self.turn = 0
@@ -116,7 +116,7 @@ class Commander(wx.Frame):
         while self.ser.inWaiting() > 0:
             print self.ser.read(),
         self.timer.Start(50)
-        
+
     def sendPacket(self, right_vertical, right_horizontal, left_vertical, left_horizontal, Buttons):
         # send output
         self.ser.write('\xFF')
@@ -127,7 +127,7 @@ class Commander(wx.Frame):
         self.ser.write(chr(Buttons))
         self.ser.write(chr(0))
         self.ser.write(chr(255 - ((right_vertical+right_horizontal+left_vertical+left_horizontal+Buttons)%256)))
-            
+
 if __name__ == "__main__":
     # commander.py <serialport>
     ser = serial.Serial()
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     ser.port = sys.argv[1]
     ser.timeout = 0.5
     ser.open()
-    
+
     app = wx.PySimpleApp()
     frame = Commander(None, ser, True)
     app.MainLoop()
