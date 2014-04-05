@@ -74,16 +74,16 @@ class editor(wx.Frame):
         self.timeout = 0
         
         # build our menu bar  
-	menubar = wx.MenuBar()
-	prjmenu = wx.Menu()
+        menubar = wx.MenuBar()
+        prjmenu = wx.Menu()
         prjmenu.Append(self.ID_NEW, "&New\tCtrl+N", "", wx.ITEM_NORMAL) # dialog with name, # of servos
-	prjmenu.Append(self.ID_OPEN, "&Open\tCtrl+O", "", wx.ITEM_NORMAL) # open file dialog
-	prjmenu.AppendSeparator()       
-	prjmenu.Append(self.ID_SAVE,"&Save\tCtrl+S", "", wx.ITEM_NORMAL) # if name unknown, ask, otherwise save
-	prjmenu.Append(self.ID_SAVE_AS,"Save As") # ask for name, save
+        prjmenu.Append(self.ID_OPEN, "&Open\tCtrl+O", "", wx.ITEM_NORMAL) # open file dialog
         prjmenu.AppendSeparator()
-	prjmenu.Append(self.ID_EXIT, "&Quit\tCtrl+Q", "", wx.ITEM_NORMAL)
-	menubar.Append(prjmenu, "Project")
+        prjmenu.Append(self.ID_SAVE,"&Save\tCtrl+S", "", wx.ITEM_NORMAL) # if name unknown, ask, otherwise save
+        prjmenu.Append(self.ID_SAVE_AS,"Save As") # ask for name, save
+        prjmenu.AppendSeparator()
+        prjmenu.Append(self.ID_EXIT, "&Quit\tCtrl+Q", "", wx.ITEM_NORMAL)
+        menubar.Append(prjmenu, "Project")
 
         toolsmenu = wx.Menu()
         # find our tools
