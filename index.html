@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="css/custom.css">
+    <title>ArbotiX RoboController - Brief PyPose Tutorial</title>
+  </head>
+
+  <body>
+    <!-- TODO: toolbar -->
+    <div id="intro">
+      <h1>ArbotiX RoboController</h1>
+      <div class="content">
+        <img style="float:left; margin:5px;width:200px;" src="img/arbotix.jpg"/>
+
+        <h3>
+        The ArbotiX robocontroller is an Arduino compatible microcontroller board, designed to control small-to-medium sized robots,
+        especially walkers that use Dynamixel AX or MX-series servos.
+        </h3>
+        <p>
+        Support is typically handled through the very active user community found in the <a href="http://forums.trossenrobotics.com">
+        Trossen Robotics Community</a> Forums. You can purchase an ArbotiX from
+        <a href="http://www.trossenrobotics.com/p/ArbotiX-robot-controller.aspx">Trossen Robotics</a>. Please file tickets on
+        <a href="https://github.com/vanadiumlabs/arbotix/issues">GitHub</a>.
+        </p>
+
+        <p><a href="http://vanadiumlabs.github.com/pypose">PyPose</a> is a related project for an open-source pose capture program.</p>
+        <p style="clear:both;"></p>
+      </div>
+    </div>
+
+    <div id="started">
+      <h1>PyPose</h1>
+      <div class="content">
+
+        <ul>
+          <li><a href="#introduction">Introduction</a></li>
+          <li><a href="#hardwaresetup">Hardware Setup</a></li>
+          <li><a href="#starting">Getting Started</a></li>
+          <li><a href="#creating">Creating a New Robot, Connecting to the arbotiX</a></li>
+          <li><a href="#pose_editor">The Pose Editor</a></li>
+          <li><a href="#sequence_editor">The Sequence Editor</a></li>
+          <li><a href="#exporting">Exporting to the AVR</a></li>
+          <li><a href="#terminal">Servo Terminal</a></li>
+          <li><a href="#hacking">Hacking</a></li>
+        </ul>
+
+
+
+
+        <a id="introduction"><h3>Introduction</h3></a>
+
+        <p>
+        One of the most important features of AX-12 servos is that we can move the servo to a particular position by hand and read the position back from the servo. This feature allows us to <i>pose</i> the robot, and <i>capture</i> the pose. <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> began as a simple open-source pose and capture program, written in Python and using wxPython for a graphical package. Traditionally, roboticists might create a series of poses, and then assemble them into a <i>motion sequence</i>.
+        </p>
+
+        <p>
+        As has often been said, there is more than one way to solve any problem. Motion sequences can be created extremely quickly using <a href="http://vanadiumlabs.github.com/pypose">PyPose</a>, but they do have limitations: 
+        <ul>
+          <li>Poses are not dynamic: given a limited number of poses, you have a limited number of positions the body can go to.</li>
+          <li>Sequence creation can become quite repetitive if you desire a higher degree of control of the robot.</li>
+        </ul>
+        </p>
+
+        <p>
+        The logical improvement is to <i>parameterize</i> the poses. By adding or subtracting the value of a dynamic parameter we can vary the response of our poses and motion sequences far more than before. This can <a href="http://code.google.com/p/arbotix/wiki/BioloidController#Walking_with_Fewer_Poses">easily be done in software</a> after you export.  </p><p>Of course, the holy grail of motion control is to have a fast Inverse Kinematics engine. Using inverse kinematics, we can compute how to place the foot of a robot into any position it can physically occupy. The <i>Nearly Universal Kinematics Engine</i>, or NUKE, is a highly templated IK solution for quadrupeds and hexapods. After answering a series of questions about the construction of the robot, we can automatically build an IK engine for the robot. Why then would we even offer poses and sequences?
+        <ul>
+          <li>NUKE still has a limited number of configurations it can handle, if you are building something like a biped you will <i>have</i> to use poses.</li>
+          <li>IK can be slow. If you have other important code to run, you may not be able to run a full IK engine.</li>
+        </ul>
+        </p>
+
+        <p>
+        Regardless of the method of motion creation, <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> exports your work directly into C code that can be loaded onto the arbotiX using the Arduino IDE. <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> also has a Terminal for editing servo parameters.  
+        </p>
+
+
+
+        <a id="hardwaresetup"><h3>Hardware Setup</h3></a>
+        <p>
+        See the <a href="http://vanadiumlabs.github.io/arbotix/#arbotixsetup">GettingSetup</a> page.
+        </p>
+
+
+        <a id="starting"><h3>Getting Started</h3></a>
+        <p>
+        We can finally start <a href="http://vanadiumlabs.github.com/pypose">PyPose</a>, the initial view will look something like this:
+        </p>
+
+        <p>
+        <img src="img/pypose.png">
+        </p>
+
+        <p>
+        <i><strong>Figure 1 - The <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> program when first loaded, showing empty pose list and pose editor.</strong></i>
+        </p>
+
+        <p>
+        This default view is the <i>Pose Editor</i>, one of the many tools in PyPose. There is a menu bar across the top of the program at all times, and a status bar across the bottom of the window. The left hand side of the status bar prompts you with <i>please create or open a project</i>. The right hand side of the status bar shows our connection status, telling us that we are currently not connected to a robot. The <strong>tools</strong> menu is probably the most important, as it lets us switch between the <i>Pose Editor</i>, <i>Sequence Editor</i>, <i>NUKE</i>, and other tools:
+        </p>
+
+        <p>
+        <img src="img/toolsmenu.png">
+        </p>
+
+
+        <a id="creating"><h3>Creating a New Robot, Connecting to the arbotiX</h3></a>
+        <p>
+        The first thing we need to do is to create a project. A project is where we will store our poses, sequences, and IK/FK configurations. Click on <strong>project|new</strong> in the menu, and the <strong>Create New Project</strong> dialog will appear. Enter the name of your robot, and the number of servos used. <i>Note: currently, servos must be number sequentially, if you have 12 servos, they must be ID1 to ID12, you can change the ID of a servo using the Servo Terminal.</i> We are now ready to begin actually talking with our robot. You can repeatedly save and open project files. 
+        </p>
+
+        <p>
+        <img src="img/newproj.png">
+        <img src="img/serial.png">
+        </p>
+
+        <p>
+        <i><strong>Figure 2 - Create New Project and Select Communications Port windows.</strong></i> </p><p>To communicate with our robot, we need open a port to our XBEE explorer, or FTDI board. You can open a port by clicking on <strong>config|port</strong> in the menu, and selecting a port name in the <strong>Select Communications Port</strong> box that will pop up (shown above). While <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> will find most serial ports, there is a chance that it cannot automatically detect your port. If this happens, use the instructions on the <i>serial</i> command below to open a port through the Terminal.
+        </p>
+
+        <p>
+        The default baud rate for the arbotiX is 38400bps, if you are using XBEE radios, be sure they are paired, and set to 38400bps. A tutorial on setting up XBEE radios can be found at the <a href="http://forums.trossenrobotics.com/tutorials/how-to-diy-128/xbee-basics-3259/" rel="nofollow">Trossen Robotic Community</a>.
+        </p>
+
+
+
+
+
+
+        <a id="pose_editor"><h3>The Pose Editor</h3></a>
+        <p>
+        Once you have created a robot, <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> will adjust to show the correct number of sliding servo adjustment bars. The box to the right of the adjustment bars displays the names of poses we have captured, since we have not captured any, it will be blank. Below the pose list, we have two buttons: <i>add</i> and <i>remove</i>, for creating a new pose or deleting one. Click on <i>add</i> and enter a name for your pose. For instance, I typically create a pose named &quot;stand&quot;, for the default standing position of my bot. If you click on a pose in the list, it&#x27;s servo values are loaded into the slider bars.
+        </p>
+
+        <p>
+        We also have 4 buttons underneath our servo adjustment bars: <i>delta-T</i>, <i>relax</i>, <i>capture</i>, and <i>set</i>. <strong>relax</strong> shuts of the servo torque, allowing you to pose the robot into place. <strong>set</strong> will write the current servo adjustment bar values out to the robot&#x27;s servos. If during a <strong>set</strong> operation, the servos were to move too fast, the robot or operator could be injured. The <strong>delta-T</strong> button brings up a dialog to select how long transitions take. This time defaults to 500ms, or half a second.
+        </p>
+
+        <p>
+        <strong>capture</strong> allows us to read the values into the slider bars. When you click <strong>capture</strong>, a status indicator will appear:
+        </p>
+
+        <p>
+        <img src="img/capture.png">
+        </p>
+
+        <p>
+        <i><strong>Figure 3 - capture status bar.</strong></i> </p><p>It should disappear quite quickly, unless <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> has trouble reading a servo. When complete, the lower left corner of the status bar will either say <i>&quot;capture done!&quot;</i> to indicate success, or list a set of servos it could not query. If you have trouble, check to make sure that you have entered the correct number of servos during robot setup, and that all of your wires are tight. Old wires may have to be replaced.
+        </p>
+
+        <p>
+        Servo values can be manually edited after a capture, just move the sliding adjustment bars. The left and right arrow keys can be used to fine tune the values. Using the <i>shift</i> key and the left and right arrows you can jump large amounts.
+        </p>
+
+        <p>
+        <img src="img/pypose2.png">
+        </p>
+
+        <p>
+        <i><strong>Figure 4 - <a href="http://vanadiumlabs.github.com/pypose">PyPose</a>, after a successful capture.</strong></i>
+        </p>
+
+        <p>
+        <i>Note: Be careful when clicking</i> capture, <i>as it will overwrite any data attached to the pose currently selected in the pose list. We are currently revamping the pose interface to be more data safe!</i>
+        </p>
+
+        <p>
+        There are several keyboard accelerators for the PyPose Pose Editor:
+        <ul>
+          <li>Ctrl-A - advance to a new pose, this creates a default name for a new pose and then selects the pose.</li>
+          <li>Ctrl-C - capture to the current pose.</li>
+          <li>Ctrl-R - relax servos.</li>
+        </ul>
+        </p>
+
+
+
+
+
+        <a id="sequence_editor"><h3>The Sequence Editor</h3></a>
+        <p>
+        Selecting <strong>tools|sequence editor</strong> will display the sequence editor instead of the pose editor. The sequence editor, shown below in <i>figure 5</i> contains a group of controls dedicated to editing an individual sequence and a list of sequences on the right side of the screen. Below the sequence editor are four buttons: <i>relax</i>, <i>run</i>, <i>loop</i>, and <i>halt</i>. <strong>relax</strong> works just like it did in the pose editor. <strong>run</strong>, <strong>loop</strong> and <strong>halt</strong> will start and stop the sequence you are currently editing from running. <strong>run</strong> runs the sequence through one iteration or until a <strong>halt</strong> is received, <strong>loop</strong> will cause the sequence to run until a <strong>halt</strong> command is received. The download of a sequence to the arbotiX may take a few moments. Below the list of sequences are two buttons: <i>add</i> and <i>remove</i> for creating and deleting sequences.
+        </p>
+
+        <p>
+        <img src="img/sequence.png">
+        </p>
+
+        <p>
+        <i><strong>Figure 5 - <a href="http://vanadiumlabs.github.com/pypose">PyPose</a>, sequence editor tool.</strong></i>
+        </p>
+
+        <p>
+        A sequence is simply a compilation of transitions that will be played in order (from the top of the transition box to the bottom of the box). Each transition consists of a pose to transition to, and a time to take during the transition denoted as <i>delta-T</i>. The <strong>new</strong> and <strong>delete</strong> buttons can be used to add new transitions or delete existing ones. Each new transition added to the box has a default pose of <i>none</i> and a time of <i>500ms</i> (1/2 of a second). The <strong>move up</strong> and <strong>move down</strong> buttons can be used to rearrange transitions.
+        </p>
+
+
+
+        <a id="exporting"><h3>Exporting to the AVR</h3></a>
+        <p>
+        Selecting <strong>tools|export to AVR</strong> will allow you to save a C header file, which contains all of your poses and sequences, in a format that stores them in FLASH memory, and makes them available to the <a href="http://vanadiumlabs.github.io/arbotix/#bioloid">BioloidController</a>. 
+        </p>
+
+
+
+        <a id="terminal"><h3>Servo Terminal</h3></a>
+        <p>
+        The servo terminal is a useful tool for configuring servos that are connected to an ArbotiX or USBDynamixel. It currently implements only a subset of it&#x27;s eventual commands. It can currently be used to query an ArbotiX to find out what servos are attached, or to change the ID number of a servo:
+        </p>
+
+        <p>
+        <img src="img/terminal.png">
+        </p>
+
+        <p>
+        <i><strong>Figure 6 - <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> Terminal, showing a sequence of edits.</strong></i>
+        </p>
+
+        <p>
+        Figure 6 shows a typical interaction with the Terminal. We need to remember to open the port. The user then typed <i>help</i> to see commands, then <i>ls</i> to see the servos and found out that servos 1,2,3,4 were attached. They then changed servo 4&#x27;s ID to 5. Now, when listing the servos with <i>ls</i>, they got 1, 2, 3, and 5. Finally, they changed servo 5 back to ID4 and ran <i>ls</i> one final time to be sure all went good.   The current command list is as follows: 
+        <ul>
+          <li>ls - list the servos attached to an ArbotiX.</li>
+          <li>mv current_id new_id - renumber a servo </li>
+          <li>serial port_name - open a serial port. <i>ex: serial /dev/ttyUSB0</i> </li>
+          <li>help - access help menu </li>
+        </ul>
+        Commands that are still under development: 
+        <ul>
+          <li>ls baud - list, with baud rate change </li>
+          <li>set param index value - set a parameter (position, speed, tuning) </li>
+          <li>get param index - get a parameter (position, speed, temp, tuning) </li>
+        </ul>
+        </p>
+
+
+        <a id="hacking"><h3>Hacking</h3><a>
+        <p>
+        Robot pose files are plain text. The format is quite simple, the first line is the robot name and servo count, separated by a colon. Each line after that should be a pose or sequence. A pose is composed of a name, colon, and then the servo values. A sequence has a name, followed by a colon, and then a list of pairs of pose names and transition times. 
+        </p>
+
+        <p>
+        <pre class="source">
+        myNewRobot:4
+        Pose=pose1: 512, 512, 512, 512 
+        Pose=poseX: 92, 104, 92, 800
+        Seq=myFirstSequence: pose1|1000, poseX|500, pose1|800
+        </pre>
+        </p>
+        <p>The communications protocol used by <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> and the sketch on your arbotiX is essentially the same as the Bioloid bus itself. We have, however, defined additional registers, and an ID of 253 will command the arbotiX to act on these special registers, which allows things like pose and sequence upload and live playback.
+        </p>
+
+
+
+
+      </div>
+    </div>
+
+    <div id="license">
+      <h1> Licensing </h1>
+      <div class="content">
+        All of the ArbotiX code, libraries, and Arduino extensions are licensed under the GNU Lesser General Public License v2.1. 
+        PyPose, and any other desktop software included (such as PyMech), is released under the GNU General Public License v2.
+      </div>
+    </div>
+
+  </body>
+</html>
+
