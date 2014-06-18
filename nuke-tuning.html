@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="css/custom.css">
+    <title>ArbotiX RoboController - Brief PyPose Tutorial</title>
+  </head>
+
+  <body>
+    <!-- TODO: toolbar -->
+    <div id="intro">
+      <h1>ArbotiX RoboController</h1>
+      <div class="content">
+        <img style="float:left; margin:5px;width:200px;" src="img/arbotix.jpg"/>
+
+        <h3>
+        The ArbotiX robocontroller is an Arduino compatible microcontroller board, designed to control small-to-medium sized robots,
+        especially walkers that use Dynamixel AX or MX-series servos.
+        </h3>
+        <p>
+        Support is typically handled through the very active user community found in the <a href="http://forums.trossenrobotics.com">
+        Trossen Robotics Community</a> Forums. You can purchase an ArbotiX from
+        <a href="http://www.trossenrobotics.com/p/ArbotiX-robot-controller.aspx">Trossen Robotics</a>. Please file tickets on
+        <a href="https://github.com/vanadiumlabs/arbotix/issues">GitHub</a>.
+        </p>
+
+        <p><a href="http://vanadiumlabs.github.com/pypose">PyPose</a> is a related project for an open-source pose capture program.  <a href="nuke-intro.html">NUKE</a> is a Nearly Universal Kinematics Engine included within PyPose.</p>
+        <p style="clear:both;"></p>
+      </div>
+    </div>
+
+    <div id="started">
+      <h1>NUKE Tuning</h1>
+      <div class="content">
+
+        <ul>
+          <li><a href="#overview">Overview of the IK Solution and Gait Engine</a></li>
+          <li><a href="#basic">Basic Gaits</a></li>
+          <li><a href="#included">Included Gaits</a></li>
+          <li><a href="#default">Default Stance, Length of Stride as an Optimization Factor</a></li>
+          <li><a href="#geometric">Geometric Stability</a></li>
+          <li><a href="#creating">Creating New Gait Generators</a></li>
+          <li><a href="#hacking">Other Hacking</a></li>
+        </ul>
+
+
+
+
+        <a id="overview"><h3>Overview of the IK Solution and Gait Engine</h3></a>
+        <p>NUKE generates a full inverse kinematics solution and a gait engine for your robot. However, you may want to tune it by hand. Before you can tune a system though, you will need to know how it works.
+        </p>
+
+        <p>
+        NUKE exports 4 files:
+        <ul>
+          <li><i>nuke.h</i> - header file for IK and gait engine </li>
+          <li><i>nuke.cpp</i> - contains the IK engine </li>
+          <li><i>gaits.h</i> - contains the gait engine </li>
+          <li><i>something.pde</i> - your sketch, this is where you will put the robot&#x27;s task-related code. </li>
+        </ul>
+        </p>
+
+        <p>
+        The main loop of your program, in <i>something.pde</i> will look like this
+        </p>
+        <pre class="source">
+void loop(){
+// put your task code here
+// make sure it doesn&#x27;t take too long to execute each cycle
+
+if(bioloid.interpolating == 0){
+  // last step is done, do the next
+  doIK();
+  bioloid.interpolateSetup(tranTime);
+}
+bioloid.interpolateStep();
+        </pre>
+
+        <p>
+        Your code will interact with the gait engine using several global variables, which can be set at any time, from anywhere in your code:
+        <ul>
+          <li><i>Xspeed</i> - the forward speed to walk at, in millimeters/second. Forward is positive. </li>
+          <li><i>Yspeed</i> - the sideways speed to walk at, in millimeters/second. Right is positive. </li>
+          <li><i>Rspeed</i> - the speed to turn at, in radians/second.</li>
+        </ul>
+        </p>
+
+        <p>
+        The body IK engine also relies on several other variables:
+        <ul>
+          <li><i>bodyPosX</i>, <i>bodyPosY</i> - offset of the center of body in the air, in millimeters. </li>
+          <li><i>bodyRotX</i>, <i>bodyRotY</i>, <i>bodyRotZ</i> - rotation of body about axis, in radians. </li>
+        </ul>
+        </p>
+
+        <p>
+        The most important function is clearly <i>doIK()</i> which ties everything from NUKE together. <i>doIK()</i> generates the IK solution for each leg&#x27;s servos, taking into account the default positions (created in <i>setupIK()</i>), gait requests, and the bodyIK parameters such as body yaw or pitch. You should not need to alter the <i>doIK()</i>, <i>bodyIK()</i> or <i>legIK()</i>. Most of the optimization that end users can do is in <i>setupIK()</i> and the gait generators.  
+        </p>
+
+
+
+
+
+
+        <a id="basic"><h3>Basic Gaits</h3></a>
+        <p>
+        Basic gaits are cyclic. We can see that as a robot moves forward, it moves it&#x27;s legs in some cyclic order. NUKE uses a gait generator function to create these movements. By passing in the leg ID and the <i>step</i> variable, the gait generator creates a set of offsets (X,Y,Z,rotation about Z) for the given leg at that step. The <i>step</i> variable counts from 0 to the number of steps in the currently selected gait -- this number is known as the <i>stepsInCycle</i>. For each cycle, every leg will move the desired distance (which is controlled by the speed variables).
+        </p>
+
+        <p>
+        A basic gait generator looks like this:
+        </p>
+        <pre class="source">
+ik_req_t DefaultGaitGen(int leg){
+ // TODO: add code here!!!!
+}
+        </pre>
+        <p>
+        By default, NUKE generates <i>continuous gaits</i>. Continuous gaits are such that the body moves in the desired direction at a continuous rate. A discontinuous gait is one that moves the body only when all feet are on the ground. When a gait is not stable enough, especially over terrain, creating a discontinuous gait may be of help.  
+        </p>
+
+
+
+
+        <a id="included"><h3>Included Gaits</h3></a>
+        <p>A number of gaits are included, which can be selected using the <i>SelectGait()</i> function: (NOTE: SOME GAITS NOT YET IN BETA)
+        </p>
+        <ul>
+          <li><i>Ripple</i> gaits move only one leg at a time: </li>
+            <ul>
+              <li>RIPPLE - the simplest, default gait. 8 steps per cycle (12 for a hexapod). Each leg is raised, and lowered, in order.</li>
+              <li>SMOOTH_RIPPLE - similar but with as twice as many steps as a RIPPLE. Makes better foot paths.</li>
+              <li>FAST_RIPPLE - 4 steps per cycle, 6 for a hexapod. As a leg lowers, another is already rising. Can be faster than RIPPLE, but may be very jerky or unsteady.</li>
+            </ul>
+          <li><i>Amble</i> gaits move two alternate legs at a time: </li>
+            <ul>
+              <li>AMBLE - 4 steps per cycle, each pair of legs is raised and moved forward in one step, then dropped in the next step.  </li>
+              <li>SMOOTH_AMBLE - similar to an AMBLE, but with twice as many steps per cycle.  </li>
+            </ul>
+          <li><i>Tripod</i> gaits move three legs at a time (For hexapods only): </li>
+            <ul>
+              <li>TRIPOD - 4 steps per cycle, like an AMBLE, but using 3 legs in a group.  </li>
+            </ul>
+          <li><i>Geometric</i> gaits are the most stable for quadrupeds, but may be slower (For quadrupeds only): </li>
+            <ul>
+              <li>RIPPLE_GEO - a geometrically confined ripple, 8 steps per cycle. (Not included in  <a href="/pypose/">PyPose</a>/NUKE V1.1) </li>
+            </ul>
+        </ul>
+  
+
+
+
+        <a id="default"><h3>Default Stance, Length of Stride as an Optimization Factor</h3></a>
+        <p>
+        NUKE computes the <i>Configuration Space</i> of your robot&#x27;s legs. The configuration space is the region of space where the legs can actually touch without any servo going out of range. From this, it can find what the default stance should be in order to maximize stride.
+        </p>
+
+        <p>
+        For most quadrupeds and hexapods, this is a good starting place. However, you may find yourself wanting to tune the default stance. This can be done by editing the <i>setupIK()</i> function. <i>setupIK</i> sets the position of the servos when the robot first starts up, and this position is what we add gait requests and body rotation requests to when we compute the final leg positions at each step in our cycle.  
+        </p>
+
+        <p>
+        Future versions of NUKE may also allow optimizations for maximal stability rather than stride length, however, at this point you would have to hand optimize for this, a first step would be the use of a Geometrically Stable gait.   
+        </p>
+
+
+
+
+        <a id="geometric"><h3>Geometric Stability</h3></a>
+        <p>
+        <font color="#FF0000">This section describes a feature available only in NUKE V1.2 and above.</font>
+        </p>
+
+        <p> NUKE can generate a geometrically stable gait, that is, the <i>Center-of-Gravity</i> of the robot is always within the <i>Support Polygon</i> created by the feet that remain on the ground.  
+        </p>
+
+        <p>
+        The <i>Stability Margin</i> is the shortest length from the COG to the support polygon as projected along the direction of gravity. What the heck does that mean? On an incline, your stability margin is less than on flat ground. Frequently, the stability margin may be difficult or impossible to determine, and so approximations are often used.  
+        </p>
+
+        <p>
+        <font color="#FF0000"> TODO: add images of stability margin/etc </font> 
+        </p>
+
+
+
+
+
+        <a id="creating"><h3>Creating New Gait Generators</h3></a>
+        <p>
+        There are two steps to creating a new gait. First, you must create a new gait generator and possibly a new gait setup, and then add the gait to the SelectGait function. 
+        </p>
+
+        <p>
+        <font color="#FF0000"> TODO: add discussion of creating Gait Generators and Setup functions, the use of tranTime, etc</font> 
+        </p>
+
+        <p>
+        After creating your new gait, you need to add the ability to select the gait. To add a new gait to your SelectGait function, you will typically add to the end of the long set of <i>if/else</i> statements:
+        </p>
+        <pre class="source">
+...
+}else if(GaitType == MY_NEW_GAIT){
+    gaitSetup = &amp;MyGaitSetup;
+    gaitGen = &amp;MyGaitGenerator;
+    gaitLegNo[RIGHT_FRONT] = 0;
+    gaitLegNo[LEFT_FRONT] = 2;
+    gaitLegNo[RIGHT_REAR] = 4;
+    gaitLegNo[LEFT_REAR] = 6;
+    pushSteps = 6;
+    stepsInCycle = 8;
+}
+        </pre>
+        
+        <p>Your code must define:
+        <ul>
+          <li><i>stepsInCycle</i> - the number of steps in a complete cycle </li>
+          <li><i>pushSteps</i> - the number of steps in a cycle where the leg is on the ground, and thus pushing in the desired direction. From a theoretical standpoint, the duty factor of each leg (time on the ground) = pushSteps/stepsInCycle.  </li>
+          <li><i>gaitLegNo</i> - defines the order in which legs are moved. How this is used depends on the gait generator and gait setup functions selected.  </li>
+          <li><i>gaitSetup</i> - the gait setup function to call at the beginning of each cycle. <i>DefaultGaitSetup</i> is a default, and empty, gait setup function. </li>
+          <li><i>gaitGen</i> - the gait generator to call for each leg. <i>DefaultGaitGen</i> is a default gait generator, which all non-geometric built-in gaits are currently using.  </li>
+        </ul>
+        </p>
+
+        <p>
+        Optionally, you may also define:
+        <ul>
+          <li><i>tranTime</i>- the time, in milliseconds, taken to do the interpolation from one position to the next. In a steady-period gait, the time taken for a cycle is simply tranTime*stepsInCycle.</li>
+          <li><i>cycleTime</i> - the time, in seconds, taken to complete a cycle. Will normally be set to (stepsInCycle*tranTime)/1000.0. However, if you are changing tranTime inside your custom gait generator, you need to set cycleTime explicitly!  </li>
+        </ul>
+        </p>
+
+
+
+
+        <a id="hacking"><h3>Other Hacking</h3></a>
+        <p>
+        <font color="#FF0000"> TODO: add what values mean, out of range issues, etc </font> 
+        </p>
+
+        <p>
+        Under development in V2.0/SVN-LATEST is a new gait file format. Gait files (.gait) contain the following:
+        </p>
+        <pre class="source">
+REQUIRES: leg 4 6
+REQUIRES: ik lizard3 mammal3
+GAIT:MY_GAIT_NAME 
+gaitGen = &amp;NewGaitGen;
+gaitSetup = &amp;DefaultGaitSetup;
+gaitLegNo[RIGHT_FRONT] = 0;
+gaitLegNo[LEFT_MIDDLE] = 0;
+gaitLegNo[RIGHT_REAR] = 0;
+gaitLegNo[LEFT_REAR] = 2;
+gaitLegNo[LEFT_FRONT] = 2;
+gaitLegNo[RIGHT_REAR] = 2;
+pushSteps = 2;  
+stepsInCycle = 4;     
+GENERATOR: NewGaitGen, This is a new gait generator
+if( MOVING ){ 
+  ...
+}
+SETUP: NewGaitSetup, This is a new setup function
+...
+GLOBAL: variableIneed
+        </pre>
+        
+        <p>
+        The first line is a requirements statement, that this gait is only for 4 or 6 legged robots. The second line is an additional statement that this gait is only to be used for the mammal3 or lizard3 IK specifications. 
+        </p>
+
+        <p>
+        Where MY_GAIT_NAME would be something like AMBLE_SMOOTH. This is followed by the actual gait generation code. We then have defined a GENERATOR, which has a name, and a description (which will be used as a comment), followed by the body of the function. 
+        </p>
+
+        <p>
+        This file format will be used to generate the <i>gaits.h</i> file automatically.
+        </p>
+
+      </div>
+    </div>
+
+    <div id="license">
+      <h1> Licensing </h1>
+      <div class="content">
+        All of the ArbotiX code, libraries, and Arduino extensions are licensed under the GNU Lesser General Public License v2.1. 
+        PyPose, and any other desktop software included (such as PyMech), is released under the GNU General Public License v2.
+      </div>
+    </div>
+
+  </body>
+</html>
+
+

@@ -24,13 +24,13 @@
         <a href="https://github.com/vanadiumlabs/arbotix/issues">GitHub</a>.
         </p>
 
-        <p><a href="http://vanadiumlabs.github.com/pypose">PyPose</a> is a related project for an open-source pose capture program.</p>
+        <p><a href="http://vanadiumlabs.github.com/pypose">PyPose</a> is a related project for an open-source pose capture program.  <a href="nuke-intro.html">NUKE</a> is a Nearly Universal Kinematics Engine included within PyPose.</p>
         <p style="clear:both;"></p>
       </div>
     </div>
 
     <div id="started">
-      <h1>PyPose</h1>
+      <h1>PyPose Introduction</h1>
       <div class="content">
 
         <ul>
@@ -63,7 +63,10 @@
         </p>
 
         <p>
-        The logical improvement is to <i>parameterize</i> the poses. By adding or subtracting the value of a dynamic parameter we can vary the response of our poses and motion sequences far more than before. This can <a href="http://code.google.com/p/arbotix/wiki/BioloidController#Walking_with_Fewer_Poses">easily be done in software</a> after you export.  </p><p>Of course, the holy grail of motion control is to have a fast Inverse Kinematics engine. Using inverse kinematics, we can compute how to place the foot of a robot into any position it can physically occupy. The <i>Nearly Universal Kinematics Engine</i>, or NUKE, is a highly templated IK solution for quadrupeds and hexapods. After answering a series of questions about the construction of the robot, we can automatically build an IK engine for the robot. Why then would we even offer poses and sequences?
+        The logical improvement is to <i>parameterize</i> the poses. By adding or subtracting the value of a dynamic parameter we can vary the response of our poses and motion sequences far more than before. This can <a href="http://code.google.com/p/arbotix/wiki/BioloidController#Walking_with_Fewer_Poses">easily be done in software</a> after you export.
+        </p>
+        <p>
+        Of course, the holy grail of motion control is to have a fast Inverse Kinematics engine. Using inverse kinematics, we can compute how to place the foot of a robot into any position it can physically occupy. The <i>Nearly Universal Kinematics Engine</i>, or NUKE, is a highly templated IK solution for quadrupeds and hexapods. After answering a series of questions about the construction of the robot, we can automatically build an IK engine for the robot. Why then would we even offer poses and sequences?
         <ul>
           <li>NUKE still has a limited number of configurations it can handle, if you are building something like a biped you will <i>have</i> to use poses.</li>
           <li>IK can be slow. If you have other important code to run, you may not be able to run a full IK engine.</li>
@@ -115,7 +118,11 @@
         </p>
 
         <p>
-        <i><strong>Figure 2 - Create New Project and Select Communications Port windows.</strong></i> </p><p>To communicate with our robot, we need open a port to our XBEE explorer, or FTDI board. You can open a port by clicking on <strong>config|port</strong> in the menu, and selecting a port name in the <strong>Select Communications Port</strong> box that will pop up (shown above). While <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> will find most serial ports, there is a chance that it cannot automatically detect your port. If this happens, use the instructions on the <i>serial</i> command below to open a port through the Terminal.
+        <i><strong>Figure 2 - Create New Project and Select Communications Port windows.</strong></i>
+        </p>
+
+        <p>
+        To communicate with our robot, we need open a port to our XBEE explorer, or FTDI board. You can open a port by clicking on <strong>config|port</strong> in the menu, and selecting a port name in the <strong>Select Communications Port</strong> box that will pop up (shown above). While <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> will find most serial ports, there is a chance that it cannot automatically detect your port. If this happens, use the instructions on the <i>serial</i> command below to open a port through the Terminal.
         </p>
 
         <p>
@@ -145,7 +152,11 @@
         </p>
 
         <p>
-        <i><strong>Figure 3 - capture status bar.</strong></i> </p><p>It should disappear quite quickly, unless <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> has trouble reading a servo. When complete, the lower left corner of the status bar will either say <i>&quot;capture done!&quot;</i> to indicate success, or list a set of servos it could not query. If you have trouble, check to make sure that you have entered the correct number of servos during robot setup, and that all of your wires are tight. Old wires may have to be replaced.
+        <i><strong>Figure 3 - capture status bar.</strong></i> 
+        </p>
+        
+        <p>
+        It should disappear quite quickly, unless <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> has trouble reading a servo. When complete, the lower left corner of the status bar will either say <i>&quot;capture done!&quot;</i> to indicate success, or list a set of servos it could not query. If you have trouble, check to make sure that you have entered the correct number of servos during robot setup, and that all of your wires are tight. Old wires may have to be replaced.
         </p>
 
         <p>
@@ -240,10 +251,10 @@
 
         <p>
         <pre class="source">
-        myNewRobot:4
-        Pose=pose1: 512, 512, 512, 512 
-        Pose=poseX: 92, 104, 92, 800
-        Seq=myFirstSequence: pose1|1000, poseX|500, pose1|800
+myNewRobot:4
+Pose=pose1: 512, 512, 512, 512 
+Pose=poseX: 92, 104, 92, 800
+Seq=myFirstSequence: pose1|1000, poseX|500, pose1|800
         </pre>
         </p>
         <p>The communications protocol used by <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> and the sketch on your arbotiX is essentially the same as the Bioloid bus itself. We have, however, defined additional registers, and an ID of 253 will command the arbotiX to act on these special registers, which allows things like pose and sequence upload and live playback.

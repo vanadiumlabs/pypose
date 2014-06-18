@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="css/custom.css">
+    <title>ArbotiX RoboController - Brief PyPose Tutorial</title>
+  </head>
+
+  <body>
+    <!-- TODO: toolbar -->
+    <div id="intro">
+      <h1>ArbotiX RoboController</h1>
+      <div class="content">
+        <img style="float:left; margin:5px;width:200px;" src="img/arbotix.jpg"/>
+
+        <h3>
+        The ArbotiX robocontroller is an Arduino compatible microcontroller board, designed to control small-to-medium sized robots,
+        especially walkers that use Dynamixel AX or MX-series servos.
+        </h3>
+        <p>
+        Support is typically handled through the very active user community found in the <a href="http://forums.trossenrobotics.com">
+        Trossen Robotics Community</a> Forums. You can purchase an ArbotiX from
+        <a href="http://www.trossenrobotics.com/p/ArbotiX-robot-controller.aspx">Trossen Robotics</a>. Please file tickets on
+        <a href="https://github.com/vanadiumlabs/arbotix/issues">GitHub</a>.
+        </p>
+
+        <p><a href="http://vanadiumlabs.github.com/pypose">PyPose</a> is a related project for an open-source pose capture program.  <a href="nuke-intro.html">NUKE</a> is a Nearly Universal Kinematics Engine included within PyPose.</p>
+        <p style="clear:both;"></p>
+      </div>
+    </div>
+
+    <div id="started">
+      <h1>NUKE Introduction</h1>
+      <div class="content">
+
+        <ul>
+          <li><a href="#NUKE">NUKE - The Nearly Universal Kinematic Engine</a></li>
+          <li><a href="#howto">How To Use NUKE</a></li>
+          <li><a href="#configuring">Gait Configuration</a></li>
+          <li><a href="#exporting">Export and Testing</a></li>
+          <li><a href="#interacting">Interacting with the IK Engine</a></li>
+          <li><a href="#tuning">Tuning NUKE</a></li>
+        </ul>
+
+
+
+
+        <a id="NUKE"><h3>NUKE - The Nearly Universal Kinematic Engine</h3></a>
+        <p>
+        The Nearly Universal Kinematics Engine (NUKE) is an easy to use <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> tool that creates a customized Inverse Kinematics solution and gait engine for your ArbotiX-powered robot. It works for most popular configurations of quadrupeds and hexapods.
+        </p>
+        <p>
+        Most of this documentation overlaps with our introductory video: 
+        </p>
+
+        <p>
+        <iframe width="425" height="344" frameborder="0"
+ src="https://www.youtube.com/embed/biA7AhWRvpU"> </iframe>
+        </p>
+
+
+
+
+
+        <a id="howto"><h3>How To Use NUKE</h3></a>
+        <p>
+        Be sure to create a robot project, and specify the number of servos before working with NUKE. This can be done exactly the same way as it was in <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> when you were just using poses and sequences. Next, select <strong>Tools|Nuke</strong> to load the NUKE editor. Most of the editor will be disabled until you select the type of IK configuration and number of legs on your robot.
+        </p>
+
+        <p>
+        <img src="img/nuke.png"> 
+        </p>
+
+        <p>
+        <i><strong>Figure 1 - NUKE editor.</strong></i> 
+        </p>
+
+        <p>
+        After selecting the type of IK and number of legs, you will want to input the lengths of the robot&#x27;s body and leg segments on the left side of the editor. Images to the side of the parameters  shows what to measure. <!--Clicking on *Help* will bring up a dialog showing you what to measure, some of the measurements are dependent on the type of IK selected.--> The next step is to select the servo mapping (which servo ID corresponds to which servo in the robot) on the right side of the editor.  
+        </p>
+
+        <p>
+        We are now setup to capture the really important values. The first thing to capture is the minimum and maximum values of each servo, the points where the servo would collide with the body. Click the button for <strong>Capture Limits</strong> and <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> will ask you to step through and move each servo to its extremes. <a href="http://vanadiumlabs.github.com/pypose">PyPose</a> automatically will configure which end is a minimum and which is a maximum. <strong>Be careful</strong> with this step, make sure that you do not rotate the servo past its 0-300 degree range, or your minimum and maximum values will be wrong.  
+        </p>
+
+        <p>
+        <img src="img/neutral.png"> 
+        </p>
+
+        <p>
+        <i><strong>Figure 2 - Neutral capture dialog for 3DOF lizard-style legs.</strong></i> 
+        </p>
+
+        <p>
+        The next step is to capture the neutral position. This will vary a bit depending on the type of IK you are using, but when you click on <strong>Capture Neutral</strong> a dialog will be presented with a picture showing where your robot&#x27;s legs should be placed. This pose will be saved as <i>ik_neutral</i>, and can be edited inside the Pose Editor if needed.  
+        </p>
+
+        <p>
+        The last step in initial setup is the sign test. We need to make sure our IK engine moves legs in the correct direction depending on how our servos are attached. Clicking <strong>Do Sign Test</strong> will send us through a series of questions like &quot;Did my left front leg move forward?&quot;. Make sure your bot is free to move (either hold it carefully, or have a stand for it).
+        </p>
+
+
+
+
+
+
+
+
+        <a id="configuring"><h3>Gait Configuration</h3></a>
+        <p>
+        At this time, no gait configuration is needed. NUKE automatically picks a default stance that should be effective. For information about how to improve performance, particularly range of motion and speed of walking, see <a href="nuke-tuning.html">NukeTuning</a>.
+        </p>
+
+        <p>
+        <!--&lt;font color=&quot;#FF0000&quot;&gt; TODO: setup the gait engine and default foot placements &lt;/font&gt; &lt;font color=&quot;#FF0000&quot;&gt; TODO: testing the gait engine &lt;/font&gt;-->
+        </p>
+
+
+
+
+
+
+        <a id="exporting"><h3>Export and Testing</h3></a>
+        <p>
+        Once the limits, neutrals, and signs are found, it is time to export our sketch. Clicking on <strong>Export</strong>, NUKE exports a complete sketch, so you will only need to select a folder in which to put a sketch and support code.
+        </p>
+
+        <p>
+        We now load the sketch inside the Arduino IDE, and download it to the robot. This sketch has a very simple <i>loop()</i> function, which will take serial commands to walk the robot around. Once the sketch is loaded we can use the <strong>Test Drive</strong> tool within NUKE to control the robot. Test Drive uses the same protocol as the ArbotiX Commander. 
+        </p>
+
+        <p>
+        <img src="img/commander.png"> 
+        </p>
+
+        <p>
+        <i><strong>Figure 3 - ArbotiX Commander Test Drive screen.</strong></i>
+        </p>
+
+
+
+
+
+
+        <a id="interacting"><h3>Interacting with the IK Engine</h3></a>
+        <p>NUKE generates a full inverse kinematics solution and a gait engine for your robot. This is composed of 4 files:
+        <ul>
+          <li><i>nuke.h</i> - header file for IK and gait engine </li>
+          <li><i>nuke.cpp</i> - contains the IK engine </li>
+          <li><i>gaits.h</i> - contains the gait engine </li>
+          <li><i>something.pde</i> - your sketch, the name of the file matches the name of the directory you chose to export to. This is where you will put the robot&#x27;s task-related code. </li>
+        </ul>
+        </p>
+
+        <p>
+        The main loop of your program, in <i>something.pde</i> will look like this:
+        </p>
+        <pre class="source">
+void loop(){
+  // put your task code here
+  // make sure it does not take too long to execute each cycle
+
+  if(bioloid.interpolating == 0){
+    // last step is done, do the next
+    doIK();
+    bioloid.interpolateSetup(tranTime);
+  }
+  bioloid.interpolateStep();
+}
+        </pre>
+
+        <p>Your code will interact with the gait engine using several global variables, which can be set at any time, from anywhere in your code:
+        <ul>
+          <li><i>Xspeed</i> - the forward speed to walk at, in millimeters/second. Forward is positive. </li>
+          <li><i>Yspeed</i> - the sideways speed to walk at, in millimeters/second. Right is positive. </li>
+          <li><i>Rspeed</i> - the speed to turn at, in radians/second.  </li>
+        </ul>
+        </p>
+
+        <p>
+        The body IK engine also relies on several other variables:
+        <ul>
+          <li><i>bodyPosX</i>, <i>bodyPosY</i> - offset of the center of body in the air, in millimeters. </li>
+          <li><i>bodyRotX</i>, <i>bodyRotY</i>, <i>bodyRotZ</i> - rotation of body about axis, in radians. </li>
+        </ul>
+        </p>
+
+        <p>
+        <i>doIK()</i> computes the position for each leg, taking into account the gait and body parameters. The interpolation part is documented under the <a href="http://vanadiumlabs.github.io/arbotix/#bioloid">BioloidController</a> library. There is also a default location for each leg, known as the <i>default stance</i>, when the gait and body engines output all zeros. This default stance is found in the <i>setupIK()</i> function of nuke.cpp.
+        </p>
+
+
+        <a id="tuning"><h3>Tuning NUKE</h3></a>
+        <p>
+        <a href="nuke-tuning.html">Details of the NUKE IK system, and how to tune it.</a>
+        </p>
+
+
+
+      </div>
+    </div>
+
+    <div id="license">
+      <h1> Licensing </h1>
+      <div class="content">
+        All of the ArbotiX code, libraries, and Arduino extensions are licensed under the GNU Lesser General Public License v2.1. 
+        PyPose, and any other desktop software included (such as PyMech), is released under the GNU General Public License v2.
+      </div>
+    </div>
+
+  </body>
+</html>
+
+
