@@ -39,7 +39,6 @@
           <li><a href="#configuring">Gait Configuration</a></li>
           <li><a href="#exporting">Export and Testing</a></li>
           <li><a href="#interacting">Interacting with the IK Engine</a></li>
-          <li><a href="#tuning">Tuning NUKE</a></li>
         </ul>
 
 
@@ -189,11 +188,6 @@ void loop(){
         <i>doIK()</i> computes the position for each leg, taking into account the gait and body parameters. The interpolation part is documented under the <a href="http://vanadiumlabs.github.io/arbotix/#bioloid">BioloidController</a> library. There is also a default location for each leg, known as the <i>default stance</i>, when the gait and body engines output all zeros. This default stance is found in the <i>setupIK()</i> function of nuke.cpp.
         </p>
 
-
-        <a id="tuning"><h3>Tuning NUKE</h3></a>
-        <p>
-        <a href="nuke-tuning.html">Details of the NUKE IK system, and how to tune it.</a>
-        </p>
 
 
 
