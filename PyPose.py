@@ -288,7 +288,7 @@ class editor(wx.Frame):
             print("Opening port: " + self.ports[dlg.GetSelection()])
             self.openPort(self.ports[dlg.GetSelection()])
             dlg.Destroy()
-    def openPort(self, port, baud=115200, interpolate=True):
+    def openPort(self, port, baud=38400, interpolate=True):
         try:
             # TODO: add ability to select type of driver
             self.port = Driver(port, baud, interpolate)
